@@ -1,5 +1,5 @@
 pipeline {
-  agent { label any }
+  agent any
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
@@ -8,16 +8,19 @@ pipeline {
   }
   stages {
     stage('Build') {
+      agent any
       steps {
         sh 'docker build -t dramos84/dp-alpine:latest .'
       }
     }
     stage('Login') {
+      agent any
       steps {
         sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
       }
     }
     stage('Push') {
+      agent any
       steps {
         sh 'docker push dramos84/dp-alpine:latest'
       }
@@ -25,7 +28,10 @@ pipeline {
   }
   post {
     always {
-      sh 'docker logout'
+      agent any
+      steps {
+        sh 'docker logout'
+      }
     }
   }
 }
